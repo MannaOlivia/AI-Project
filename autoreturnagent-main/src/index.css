@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 220 17% 97%;
+    --foreground: 220 20% 15%;
+
+    /* Card colors */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    /* Popover colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Primary - Professional Blue (trust) */
+    --primary: 214 95% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Slate */
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 220 20% 15%;
+
+    /* Muted */
+    --muted: 220 15% 95%;
+    --muted-foreground: 220 10% 46%;
+
+    /* Accent - Emerald Green (approval) */
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success - Green */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Destructive - Red (denial) */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border and input */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 214 95% 36%;
+
+    /* Radius */
+    --radius: 0.75rem;
+
+    /* Custom tokens for status colors */
+    --status-pending: 43 96% 56%;
+    --status-approved: 142 76% 36%;
+    --status-denied: 0 84% 60%;
+    --status-processing: 214 95% 36%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(214 95% 36%), hsl(214 95% 46%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Base colors */
+    --background: 220 20% 10%;
+    --foreground: 220 10% 95%;
+
+    /* Card colors */
+    --card: 220 20% 14%;
+    --card-foreground: 220 10% 95%;
+
+    /* Popover colors */
+    --popover: 220 20% 14%;
+    --popover-foreground: 220 10% 95%;
+
+    /* Primary - Professional Blue (trust) */
+    --primary: 214 95% 46%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary */
+    --secondary: 220 20% 20%;
+    --secondary-foreground: 220 10% 95%;
+
+    /* Muted */
+    --muted: 220 20% 20%;
+    --muted-foreground: 220 10% 65%;
+
+    /* Accent - Emerald Green (approval) */
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success */
+    --success: 142 76% 46%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning */
+    --warning: 38 92% 60%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border and input */
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 214 95% 46%;
+
+    /* Custom status colors for dark mode */
+    --status-pending: 43 96% 66%;
+    --status-approved: 142 76% 46%;
+    --status-denied: 0 84% 70%;
+    --status-processing: 214 95% 46%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

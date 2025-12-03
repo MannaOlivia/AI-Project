@@ -1,0 +1,10 @@
+project_id = "xtxgqqjfeylvlprgkxhk"
+
+[functions.analyze-return]
+verify_jwt = true
+
+[functions.assign-orders]
+verify_jwt = true
+
+[functions.import-orders]
+verify_jwt = false
