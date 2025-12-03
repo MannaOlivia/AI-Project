@@ -32,7 +32,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY")!;
+    const openaiApiKey = Deno.env.get("OPENAI_API_KEY")!
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -111,14 +111,14 @@ serve(async (req) => {
     
     if (imageUrl) {
       console.log("Checking if image is suspicious or AI-generated...");
-      const suspiciousCheckResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const suspiciousCheckResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${lovableApiKey}`,
+          Authorization: `Bearer ${openaiApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gpt-4o",
           messages: [
             {
               role: "system",
@@ -209,15 +209,15 @@ If uncertain, always prefer to flag for manual review rather than making a defin
       });
     }
 
-    console.log("Calling Lovable AI for vision analysis...");
-    const visionResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("Calling OpenAI for vision analysis...");
+    const visionResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
+        Authorization: `Bearer ${openaiApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o",
         messages: visionMessages,
       }),
     });
@@ -234,14 +234,14 @@ If uncertain, always prefer to flag for manual review rather than making a defin
 
     // Step 3: Extract structured data using tool calling
     console.log("Extracting defect data and confidence...");
-    const structuredResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const structuredResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
+        Authorization: `Bearer ${openaiApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o",
         messages: [
           {
             role: "user",
@@ -412,14 +412,14 @@ If uncertain, always prefer to flag for manual review rather than making a defin
 
     // Step 5: Generate short email draft
     console.log("Generating email draft...");
-    const emailResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const emailResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
+        Authorization: `Bearer ${openaiApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
