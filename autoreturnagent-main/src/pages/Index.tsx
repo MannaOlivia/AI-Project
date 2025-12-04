@@ -19,7 +19,6 @@ const Index = () => {
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [testMode, setTestMode] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -27,19 +26,9 @@ const Index = () => {
 
   const checkAuth = async () => {
     try {
-      // Check for test mode bypass
-      const urlParams = new URLSearchParams(window.location.search);
-      const isTestMode = sessionStorage.getItem('testMode') === 'true' || urlParams.get('testMode') === 'true';
-      
-      if (isTestMode) {
-        console.log("TEST MODE: Bypassing authentication");
-        setTestMode(true);
-        setIsAdmin(true); // Grant admin access in test mode
-        setLoading(false);
-        return;
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
+      
+      console.log("Session:", session?.user?.email);
       
       if (!session) {
         navigate("/auth");
@@ -47,13 +36,19 @@ const Index = () => {
       }
 
       // Check if user has admin role
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", session.user.id)
-        .single();
+        .eq("user_id", session.user.id);
 
-      setIsAdmin(roleData?.role === "admin");
+      console.log("Role Data:", roleData);
+      console.log("Role Error:", roleError);
+
+      // Check if ANY of the roles is admin
+      const hasAdminRole = roleData?.some((r: any) => r.role === "admin");
+      console.log("Has Admin Role:", hasAdminRole);
+      
+      setIsAdmin(hasAdminRole || false);
     } catch (error) {
       console.error("Auth check error:", error);
     } finally {
@@ -94,42 +89,46 @@ const Index = () => {
                 <h1 className="text-2xl font-bold text-foreground">Returns Resolution</h1>
                 <p className="text-sm text-muted-foreground">
                   AI-Powered Autonomous Return Processing
-                  {testMode && <span className="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded text-xs font-medium">⚡ TEST MODE</span>}
                 </p>
               </div>
             </div>
-            <Button variant="ghost" onClick={testMode ? () => {
-              sessionStorage.removeItem('testMode');
-              navigate('/auth');
-            } : handleLogout}>
+            <Button variant="ghost" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
-              {testMode ? 'Exit Test Mode' : 'Logout'}
+              Logout
             </Button>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="customer" className="w-full">
-          <TabsList className={`grid w-full max-w-4xl mx-auto mb-8 ${isAdmin ? 'grid-cols-8' : 'grid-cols-4'}`}>
-            <TabsTrigger value="customer" className="gap-2">
-              <Package className="h-4 w-4" />
-              Submit Return
-            </TabsTrigger>
-            <TabsTrigger value="portal" className="gap-2">
-              <Package className="h-4 w-4" />
-              My Returns
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              My Orders
-            </TabsTrigger>
-            <TabsTrigger value="admin" className="gap-2">
-              <Shield className="h-4 w-4" />
-              Dashboard
-            </TabsTrigger>
+        <Tabs defaultValue={isAdmin ? "admin" : "customer"} className="w-full">
+          <TabsList className={`grid w-full max-w-4xl mx-auto mb-8 ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            {!isAdmin && (
+              <>
+                <TabsTrigger value="customer" className="gap-2">
+                  <Package className="h-4 w-4" />
+                  Submit Return
+                </TabsTrigger>
+                <TabsTrigger value="portal" className="gap-2">
+                  <Package className="h-4 w-4" />
+                  My Returns
+                </TabsTrigger>
+                <TabsTrigger value="orders" className="gap-2">
+                  <ShoppingBag className="h-4 w-4" />
+                  My Orders
+                </TabsTrigger>
+                <TabsTrigger value="admin" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Dashboard
+                </TabsTrigger>
+              </>
+            )}
             {isAdmin && (
               <>
+                <TabsTrigger value="admin" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Dashboard
+                </TabsTrigger>
                 <TabsTrigger value="review" className="gap-2">
                   <FileText className="h-4 w-4" />
                   Manual Review
@@ -150,21 +149,31 @@ const Index = () => {
             )}
           </TabsList>
 
-          <TabsContent value="customer">
-            <ReturnSubmission />
-          </TabsContent>
+          {!isAdmin && (
+            <>
+              <TabsContent value="customer">
+                <ReturnSubmission />
+              </TabsContent>
 
-          <TabsContent value="portal">
-            <CustomerPortal />
-          </TabsContent>
+              <TabsContent value="portal">
+                <CustomerPortal />
+              </TabsContent>
 
-          <TabsContent value="orders">
-            <MyOrders />
-          </TabsContent>
+              <TabsContent value="orders">
+                <MyOrders />
+              </TabsContent>
 
-          <TabsContent value="admin">
-            <AdminDashboard />
-          </TabsContent>
+              <TabsContent value="admin">
+                <AdminDashboard />
+              </TabsContent>
+            </>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="admin">
+              <AdminDashboard />
+            </TabsContent>
+          )}
 
           {isAdmin && (
             <>

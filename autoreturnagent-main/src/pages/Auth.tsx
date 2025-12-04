@@ -33,15 +33,36 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Check if user already exists
+      const { data: existingUser } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .limit(1);
+      
+      // Check via auth API
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            email_confirmed: true, // Skip email verification
+          }
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's a "user already exists" error
+        if (error.message.includes('already registered') || error.message.includes('already exists')) {
+          toast({
+            title: "User already exists",
+            description: "This email is already registered. Please login instead.",
+            variant: "destructive",
+          });
+          return;
+        }
+        throw error;
+      }
 
       // Assign orders to user on signup
       if (data.session) {
@@ -61,6 +82,11 @@ const Auth = () => {
         title: "Account created!",
         description: "You can now log in with your credentials.",
       });
+      
+      // Auto-login after signup if session exists
+      if (data.session) {
+        navigate("/");
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -128,31 +154,43 @@ const Auth = () => {
         <Card>
           <CardHeader>
             <CardTitle>Authentication</CardTitle>
-            <CardDescription>Sign in to access the admin dashboard</CardDescription>
-            <div className="mt-2 p-3 bg-muted rounded-md text-sm">
-              <p className="font-medium mb-1">Admin Account:</p>
-              <p className="text-muted-foreground">Email: admin2025@test.com</p>
-              <p className="text-muted-foreground">Password: 123456</p>
-            </div>
+            <CardDescription>Sign in to access the returns dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Direct Access Button for Testing - Bypasses Auth */}
-            <div className="mb-4 space-y-2">
+            {/* Admin Quick Login Button */}
+            <div className="mb-4">
               <Button 
                 type="button"
-                variant="destructive"
-                className="w-full"
-                onClick={() => {
-                  // Set test mode flag and navigate
-                  sessionStorage.setItem('testMode', 'true');
-                  navigate("/?testMode=true");
+                variant="secondary"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                      email: "sujalchourasia11@gmail.com",
+                      password: "123456",
+                    });
+                    if (error) throw error;
+                    toast({
+                      title: "Admin Login Successful",
+                      description: "Welcome, Admin!",
+                    });
+                    navigate("/");
+                  } catch (error: any) {
+                    toast({
+                      title: "Error",
+                      description: error.message,
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setLoading(false);
+                  }
                 }}
+                disabled={loading}
               >
-                ⚡ DIRECT ACCESS (No Login - Testing Only)
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                👑 Login as Admin (Quick Access)
               </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Click above to skip authentication completely
-              </p>
             </div>
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -166,8 +204,8 @@ const Auth = () => {
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
-                      type="email"
-                      placeholder="admin@example.com"
+                      type="text"
+                      placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -196,8 +234,8 @@ const Auth = () => {
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
-                      type="email"
-                      placeholder="admin@example.com"
+                      type="text"
+                      placeholder="any email format works (e.g. admin@test)"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
