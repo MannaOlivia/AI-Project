@@ -78,3 +78,5 @@ Estimated costs:
 - Image analysis: ~$0.01-0.05 per request
 - Text generation: ~$0.001-0.01 per request
 
+
+

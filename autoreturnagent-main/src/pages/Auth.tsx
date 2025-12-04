@@ -136,6 +136,24 @@ const Auth = () => {
             </div>
           </CardHeader>
           <CardContent>
+            {/* Direct Access Button for Testing - Bypasses Auth */}
+            <div className="mb-4 space-y-2">
+              <Button 
+                type="button"
+                variant="destructive"
+                className="w-full"
+                onClick={() => {
+                  // Set test mode flag and navigate
+                  sessionStorage.setItem('testMode', 'true');
+                  navigate("/?testMode=true");
+                }}
+              >
+                ⚡ DIRECT ACCESS (No Login - Testing Only)
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Click above to skip authentication completely
+              </p>
+            </div>
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4">
                 <TabsTrigger value="login">Login</TabsTrigger>

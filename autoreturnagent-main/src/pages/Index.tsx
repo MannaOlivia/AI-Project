@@ -19,6 +19,7 @@ const Index = () => {
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [testMode, setTestMode] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -26,6 +27,18 @@ const Index = () => {
 
   const checkAuth = async () => {
     try {
+      // Check for test mode bypass
+      const urlParams = new URLSearchParams(window.location.search);
+      const isTestMode = sessionStorage.getItem('testMode') === 'true' || urlParams.get('testMode') === 'true';
+      
+      if (isTestMode) {
+        console.log("TEST MODE: Bypassing authentication");
+        setTestMode(true);
+        setIsAdmin(true); // Grant admin access in test mode
+        setLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
@@ -79,12 +92,18 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Returns Resolution</h1>
-                <p className="text-sm text-muted-foreground">AI-Powered Autonomous Return Processing</p>
+                <p className="text-sm text-muted-foreground">
+                  AI-Powered Autonomous Return Processing
+                  {testMode && <span className="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded text-xs font-medium">⚡ TEST MODE</span>}
+                </p>
               </div>
             </div>
-            <Button variant="ghost" onClick={handleLogout}>
+            <Button variant="ghost" onClick={testMode ? () => {
+              sessionStorage.removeItem('testMode');
+              navigate('/auth');
+            } : handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              {testMode ? 'Exit Test Mode' : 'Logout'}
             </Button>
           </div>
         </div>
